@@ -27,50 +27,57 @@ Take three frames from the laptop camera and mark the objects in each one with Y
 
 #### 1.
 
-`python
-import time
+```python
+from ultralytics import YOLO
 import cv2
 import matplotlib.pyplot as plt
-from ultralytics import YOLO
-`
+from IPython.display import clear_output
+```
 
 #### 2.
 
-`python
-model = YOLO("yolov8n.pt")
-`
+```python
+model = YOLO("yolov8m.pt")
+```
 
 #### 3.
 
-`python
+```python
 cap = cv2.VideoCapture(0)
-frames = []
-for shot in range(3):
-    start = time.time()
-    frame = None
-    while time.time() - start < 5:
-        ok, frame = cap.read()
-        if not ok:
-            break
-    frames.append(frame)
-cap.release()
-`
+```
 
 #### 4.
 
-`python
-for shot, frame in enumerate(frames, 1):
-    detected = model.predict(frame, verbose=False)[0]
-    print(f"Scene {shot}")
-    for box in detected.boxes:
-        print(detected.names[int(box.cls)], round(float(box.conf), 2))
-    drawn = detected.plot()
-    cv2.imwrite(f"output/0{shot}-detected.png", drawn)
-    plt.imshow(cv2.cvtColor(drawn, cv2.COLOR_BGR2RGB))
-    plt.title(f"Detected Objects {shot}")
-    plt.axis("off")
-    plt.show()
-`
+```python
+if not cap.isOpened():
+    print("Error: Could not open webcam.")
+else:
+    while True:
+        ret, frame = cap.read()
+
+        if not ret:
+            print("Failed to capture frame.")
+            break
+
+        results = model(
+            frame,
+            conf=0.60,
+            verbose=False
+        )
+
+        annotated_frame = results[0].plot()
+        annotated_frame = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
+
+        clear_output(wait=True)
+        plt.figure(figsize=(10, 8))
+        plt.imshow(annotated_frame)
+        plt.title("Real-Time Object Detection")
+        plt.axis("off")
+        plt.show()
+
+cap.release()
+cv2.destroyAllWindows()
+```
 
 ## Output
 
