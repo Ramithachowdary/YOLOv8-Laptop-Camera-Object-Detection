@@ -7,7 +7,7 @@
 
 ## Aim
 
-Take one frame from the laptop camera, wait a few seconds before the shot, and mark the objects in it with YOLOv8.
+Take three frames from the laptop camera and mark the objects in each one with YOLOv8.
 
 ## Software Required
 
@@ -19,73 +19,76 @@ Take one frame from the laptop camera, wait a few seconds before the shot, and m
 
 **Step 1:** Load the YOLOv8 nano model.
 
-**Step 2:** Open the webcam, wait 5 seconds, and keep the latest frame.
+**Step 2:** Open the webcam and take three frames, waiting 5 seconds before each shot.
 
-**Step 3:** Run detection, print the labels, and show the boxes.
-
-**Step 4:** Release the camera.
+**Step 3:** Run detection on each frame and show the boxes with the labels.
 
 ## Program
 
 #### 1.
 
-```python
+`python
 import time
 import cv2
 import matplotlib.pyplot as plt
 from ultralytics import YOLO
-```
+`
 
 #### 2.
 
-```python
+`python
 model = YOLO("yolov8n.pt")
-```
+`
 
 #### 3.
 
-```python
+`python
 cap = cv2.VideoCapture(0)
-start = time.time()
-frame = None
-while time.time() - start < 5:
-    ok, frame = cap.read()
-    if not ok:
-        break
-cv2.imwrite("captured_frame.jpg", frame)
-plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-plt.title("Captured Frame")
-plt.axis("off")
-plt.show()
-```
+frames = []
+for shot in range(3):
+    start = time.time()
+    frame = None
+    while time.time() - start < 5:
+        ok, frame = cap.read()
+        if not ok:
+            break
+    frames.append(frame)
+    cv2.imwrite(f"output/0{shot + 1}-captured.png", frame)
+    plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+    plt.title(f"Captured Frame {shot + 1}")
+    plt.axis("off")
+    plt.show()
+cap.release()
+`
 
 #### 4.
 
-```python
-detected = model.predict(frame, verbose=False)[0]
-for box in detected.boxes:
-    name = detected.names[int(box.cls)]
-    print(name, round(float(box.conf), 2))
-annotated = detected.plot()
-cv2.imwrite("output/02-detected.png", annotated)
-plt.imshow(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB))
-plt.title("Detected Objects")
-plt.axis("off")
-plt.show()
-```
-
-#### 5.
-
-```python
-cap.release()
-```
+`python
+for shot, frame in enumerate(frames, 1):
+    detected = model.predict(frame, verbose=False)[0]
+    print(f"Scene {shot}")
+    for box in detected.boxes:
+        print(detected.names[int(box.cls)], round(float(box.conf), 2))
+    drawn = detected.plot()
+    cv2.imwrite(f"output/0{shot + 3}-detected.png", drawn)
+    plt.imshow(cv2.cvtColor(drawn, cv2.COLOR_BGR2RGB))
+    plt.title(f"Detected Objects {shot}")
+    plt.axis("off")
+    plt.show()
+`
 
 ## Output
 
-<img width="1024" height="576" alt="Captured Frame" src="output/01-captured.png" />
+<img width="1024" height="576" alt="Captured Frame 1" src="output/01-captured.png" />
 
-<img width="1024" height="576" alt="Detected Objects" src="output/02-detected.png" />
+<img width="1024" height="576" alt="Detected Objects 1" src="output/04-detected.png" />
+<img width="1024" height="576" alt="Captured Frame 2" src="output/02-captured.png" />
+
+<img width="1024" height="576" alt="Detected Objects 2" src="output/05-detected.png" />
+<img width="1024" height="576" alt="Captured Frame 3" src="output/03-captured.png" />
+
+<img width="1024" height="576" alt="Detected Objects 3" src="output/06-detected.png" />
 
 ## Result
 
-A frame from the laptop camera was passed through YOLOv8 and the objects were drawn with their labels.
+Three frames from the laptop camera were passed through YOLOv8. The person was marked in each frame, and the phone was marked in the third.
