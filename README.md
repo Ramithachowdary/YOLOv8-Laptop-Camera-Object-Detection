@@ -53,11 +53,6 @@ for shot in range(3):
         if not ok:
             break
     frames.append(frame)
-    cv2.imwrite(f"output/0{shot + 1}-captured.png", frame)
-    plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-    plt.title(f"Captured Frame {shot + 1}")
-    plt.axis("off")
-    plt.show()
 cap.release()
 `
 
@@ -70,7 +65,7 @@ for shot, frame in enumerate(frames, 1):
     for box in detected.boxes:
         print(detected.names[int(box.cls)], round(float(box.conf), 2))
     drawn = detected.plot()
-    cv2.imwrite(f"output/0{shot + 3}-detected.png", drawn)
+    cv2.imwrite(f"output/0{shot}-detected.png", drawn)
     plt.imshow(cv2.cvtColor(drawn, cv2.COLOR_BGR2RGB))
     plt.title(f"Detected Objects {shot}")
     plt.axis("off")
@@ -79,15 +74,11 @@ for shot, frame in enumerate(frames, 1):
 
 ## Output
 
-<img width="1024" height="576" alt="Captured Frame 1" src="output/01-captured.png" />
+<img width="1024" height="576" alt="Detected Objects 1" src="output/01-detected.png" />
 
-<img width="1024" height="576" alt="Detected Objects 1" src="output/04-detected.png" />
-<img width="1024" height="576" alt="Captured Frame 2" src="output/02-captured.png" />
+<img width="1024" height="576" alt="Detected Objects 2" src="output/02-detected.png" />
 
-<img width="1024" height="576" alt="Detected Objects 2" src="output/05-detected.png" />
-<img width="1024" height="576" alt="Captured Frame 3" src="output/03-captured.png" />
-
-<img width="1024" height="576" alt="Detected Objects 3" src="output/06-detected.png" />
+<img width="1024" height="576" alt="Detected Objects 3" src="output/03-detected.png" />
 
 ## Result
 
